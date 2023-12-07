@@ -1,0 +1,16 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Wumpus,default,Main,14,0,0,0,7,0,2,0,2,0
+Wumpus,Sfv,Sfv,125,207,43,21,22,47,31,17,5,11
+Wumpus,State,User,9,20,0,0,3,6,3,2,3,2
+Wumpus,State,XmlMap,26,94,0,2,6,33,2,21,2,20
+Wumpus,State,ReadFile,13,62,3,3,6,17,3,3,0,3
+Wumpus,State,WriteToFile,11,47,0,0,6,12,0,3,0,3
+Wumpus,State,Database,108,102,8,4,26,30,6,4,1,3
+Wumpus,Base,Game,920,439,158,46,266,107,125,20,21,10
+Wumpus,Base,Coord,15,0,0,0,6,0,3,0,3,0
+Wumpus,Base,Direction,0,49,0,0,0,10,0,3,0,3
+Wumpus,Base,wMap,47,66,4,3,9,21,8,9,4,8
+Wumpus,Base,Board,111,1440,46,175,33,273,51,109,5,34
+Wumpus,Base,Hero,56,94,4,4,12,34,8,17,5,16
+Wumpus,Base,Tile,0,23,0,0,0,10,0,5,0,5
+Wumpus,Base,TileType,0,63,0,0,0,12,0,3,0,3

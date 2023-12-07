@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="hu"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Game.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Wumpus</a> &gt; <a href="index.source.html" class="el_package">Base</a> &gt; <span class="el_source">Game.java</span></div><h1>Game.java</h1><pre class="source lang-java linenums">package Base;
+
+import Sfv.Sfv;
+import State.*;
+
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+
+public class Game {
+    private Board board;
+    private Scanner scanner;
+    private String username;
+    private int userscore, usersteps;
+    private Database db;
+
+    private boolean win;
+    private boolean giveup;
+    private boolean gameover;
+    private boolean herodead;
+
+<span class="fc" id="L23">    public Game() {</span>
+
+<span class="fc" id="L25">        this.db = new Database();</span>
+<span class="fc" id="L26">        this.scanner = new Scanner(System.in);</span>
+<span class="fc" id="L27">    }</span>
+
+    public void Start() {
+<span class="nc" id="L30">        Start(false);</span>
+<span class="nc" id="L31">    }</span>
+
+    public void Start(boolean testMode) {
+
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">        if(db.isConnected()) {</span>
+<span class="nc" id="L36">            ArrayList&lt;User&gt; users = db.getUsers();</span>
+
+<span class="nc bnc" id="L38" title="All 2 branches missed.">            if (users != null) {</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">                for (int i = 0; i &lt; users.size(); i++) {</span>
+<span class="nc" id="L40">                    System.out.println(users.get(i));</span>
+                }
+            }
+        }
+
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if(!testMode) {</span>
+<span class="nc" id="L46">            setName();</span>
+<span class="nc" id="L47">            drawBoard();</span>
+<span class="nc" id="L48">            MainMenu();</span>
+        } else {
+<span class="fc" id="L50">            username = &quot;Johnnytest&quot;;</span>
+        }
+<span class="fc" id="L52">    }</span>
+
+    private int getFileType() {
+<span class="nc" id="L55">        boolean ok = false;</span>
+<span class="nc" id="L56">        int tipus = -1;</span>
+
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        while(!ok) {</span>
+<span class="nc" id="L59">            System.out.print(&quot;Mentés típusa: 0. TXT, 1. XML: &quot;);</span>
+<span class="nc" id="L60">            String s = scanner.nextLine();</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">            if(Sfv.isNumeric(s)) tipus = Sfv.getInteger(s);</span>
+<span class="nc bnc" id="L62" title="All 4 branches missed.">            if(tipus == 0 || tipus == 1) ok = true;</span>
+<span class="nc" id="L63">        }</span>
+<span class="nc" id="L64">        return tipus;</span>
+    }
+
+
+    public boolean createBoard(int manualSize) {
+<span class="fc" id="L69">        int size = -1;</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if(manualSize == -1) {</span>
+<span class="nc" id="L71">            boolean finished = false;</span>
+
+<span class="nc bnc" id="L73" title="All 2 branches missed.">            while (!finished) {</span>
+<span class="nc" id="L74">                System.out.println(&quot;Pálya méret (6-20): &quot;);</span>
+<span class="nc" id="L75">                String s = scanner.next();</span>
+<span class="nc" id="L76">                size = Sfv.getInteger(s);</span>
+<span class="nc bnc" id="L77" title="All 4 branches missed.">                if (size &gt; 5 &amp;&amp; size &lt; 21) finished = true;</span>
+<span class="nc" id="L78">            }</span>
+<span class="nc" id="L79">        } else {</span>
+<span class="fc" id="L80">            size = manualSize;</span>
+        }
+
+<span class="pc bpc" id="L83" title="2 of 4 branches missed.">        if(size &gt; 5 &amp;&amp; size &lt;21) {</span>
+<span class="fc" id="L84">            this.board = null;</span>
+<span class="fc" id="L85">            this.board = new Board(size);</span>
+<span class="fc" id="L86">            board.Init();</span>
+<span class="fc" id="L87">            System.gc();</span>
+<span class="fc" id="L88">            return true;</span>
+        }
+<span class="nc" id="L90">        return false;</span>
+    }
+
+    public Board getBoard() {
+<span class="fc" id="L94">        return this.board;</span>
+    }
+
+    public boolean dbConnection() {
+<span class="nc" id="L98">        return db.isConnected();</span>
+    }
+
+    public boolean isWin() {
+<span class="nc" id="L102">        return win;</span>
+    }
+
+    public boolean isGiveup() {
+<span class="nc" id="L106">        return giveup;</span>
+    }
+
+    public boolean isGameover() {
+<span class="nc" id="L110">        return gameover;</span>
+    }
+
+    public boolean isHerodead() {
+<span class="nc" id="L114">        return herodead;</span>
+    }
+
+    ///////
+
+    public boolean StateLoader(boolean state) {
+<span class="nc" id="L120">        return StateLoader(state, &quot;&quot;);</span>
+    }
+
+    public  boolean StateLoader(boolean state, String manualFilename) {
+<span class="fc" id="L124">        ReadFile reader = new ReadFile();</span>
+
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        String DIR = (state ? &quot;src\\States\\&quot; : &quot;src\\Maps\\&quot;);</span>
+<span class="fc" id="L127">        String filename = null;</span>
+<span class="fc" id="L128">        int index = -1;</span>
+
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if(manualFilename.length() == 0) {</span>
+<span class="nc" id="L131">            ArrayList&lt;String&gt; list = Sfv.listFiles(DIR);</span>
+
+<span class="nc" id="L133">            System.out.println(&quot;--== FÁJL LISTA ==--&quot;);</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">            for (int i = 0; i &lt; list.size(); System.out.println(String.format(&quot;%3d. &quot;, i) + list.get(i++))) ;</span>
+
+<span class="nc bnc" id="L136" title="All 4 branches missed.">            while (index &lt; 0 || index &gt; list.size()) {</span>
+<span class="nc" id="L137">                System.out.print(&quot;Adja meg a mentés sorszámát: &quot;);</span>
+<span class="nc" id="L138">                String s = scanner.next();</span>
+<span class="nc" id="L139">                index = Sfv.getInteger(s);</span>
+<span class="nc" id="L140">            }</span>
+<span class="nc" id="L141">            filename = list.get(index);</span>
+<span class="nc" id="L142">        } else {</span>
+<span class="fc" id="L143">            filename = manualFilename;</span>
+        }
+<span class="fc" id="L145">        String extension = Sfv.getFileExtension(filename);</span>
+
+<span class="fc" id="L147">        int size = 0;</span>
+<span class="fc" id="L148">        int posx = 0;</span>
+<span class="fc" id="L149">        int posy = 0;</span>
+<span class="fc" id="L150">        int dir = 0;</span>
+<span class="fc" id="L151">        int arrows = 0;</span>
+
+<span class="fc" id="L153">        String adat = &quot;&quot;;</span>
+<span class="fc" id="L154">        String fajladat = &quot;&quot;;</span>
+
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">        if(extension.equals(&quot;&quot;)) {</span>
+
+<span class="nc" id="L158">            ArrayList&lt;wMap&gt; levels = db.getMaps(filename, username);</span>
+
+<span class="nc bnc" id="L160" title="All 2 branches missed.">            if (levels != null) {</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">                for (int i = 0; i &lt; levels.size(); i++) {</span>
+<span class="nc" id="L162">                    System.out.println(levels.get(i));</span>
+                }
+            }
+        }
+
+<span class="fc bfc" id="L167" title="All 2 branches covered.">        if (extension.equals(&quot;txt&quot;)) {</span>
+<span class="fc" id="L168">            fajladat = reader.ReadInTextFile(DIR + filename).toUpperCase();</span>
+<span class="fc" id="L169">            String head = fajladat.substring(0, fajladat.indexOf('\r')).trim();</span>
+<span class="fc" id="L170">            adat = fajladat.substring(fajladat.indexOf('\n')).trim();</span>
+
+<span class="fc" id="L172">            StringTokenizer st = new StringTokenizer(head, &quot; &quot;);</span>
+
+<span class="fc" id="L174">            index = 0;</span>
+
+<span class="fc bfc" id="L176" title="All 2 branches covered.">            while (st.hasMoreTokens()) {</span>
+<span class="fc" id="L177">                String s = st.nextToken();</span>
+
+<span class="pc bpc" id="L179" title="1 of 5 branches missed.">                switch (index) {</span>
+                    case 0:
+<span class="fc" id="L181">                        size = Sfv.getInteger(s);</span>
+<span class="fc" id="L182">                        break;</span>
+                    case 1:
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">                        if (s.length() == 1) {</span>
+<span class="fc" id="L185">                            posx = s.charAt(0) - 'A';</span>
+                        } else {
+<span class="nc" id="L187">                            posx = -1;</span>
+                        }
+<span class="nc" id="L189">                        break;</span>
+                    case 2:
+<span class="fc" id="L191">                        posy = Sfv.getInteger(s);</span>
+<span class="fc" id="L192">                        break;</span>
+                    case 3:
+<span class="pc bpc" id="L194" title="1 of 2 branches missed.">                        if (s.length() == 1) {</span>
+<span class="fc" id="L195">                            dir = s.charAt(0);</span>
+                        } else {
+<span class="nc" id="L197">                            dir = 0;</span>
+                        }
+                        break;
+                }
+<span class="fc" id="L201">                index++;</span>
+<span class="fc" id="L202">            }</span>
+        }
+
+<span class="fc bfc" id="L205" title="All 2 branches covered.">        if (extension.equals(&quot;xml&quot;)) {</span>
+<span class="fc" id="L206">            XmlMap map = reader.ReadInXmlFile(DIR + filename);</span>
+<span class="fc" id="L207">            size = map.getSize();</span>
+<span class="fc" id="L208">            posx = map.getHeroCol().charAt(0) - 'A';</span>
+<span class="fc" id="L209">            posy = map.getHeroRow();</span>
+<span class="fc" id="L210">            dir = map.getHeroDir().toUpperCase().charAt(0);</span>
+<span class="fc" id="L211">            arrows = map.getArrows();</span>
+<span class="fc" id="L212">            adat = map.getData();</span>
+        }
+
+<span class="fc" id="L215">        adat = Sfv.StringReplaceAll(adat, &quot;\r&quot;, &quot;&quot;);</span>
+<span class="fc" id="L216">        adat = Sfv.StringReplaceAll(adat, &quot;\n&quot;, &quot;&quot;);</span>
+<span class="fc" id="L217">        adat = Sfv.StringReplaceAll(adat, &quot;\t&quot;, &quot;&quot;);</span>
+<span class="fc" id="L218">        adat = Sfv.StringReplaceAll(adat, &quot; &quot;, &quot;&quot;);</span>
+
+<span class="fc" id="L220">        int check = adat.length();</span>
+<span class="fc" id="L221">        int check_a = (size * size) - check;</span>
+
+<span class="fc" id="L223">        wMap map = new wMap(size, posx, posy, dir, arrows, 0,0,adat);</span>
+
+<span class="pc bpc" id="L225" title="2 of 4 branches missed.">        if ((size &gt; 5 &amp;&amp; size &lt; 21)) {</span>
+<span class="pc bpc" id="L226" title="2 of 4 branches missed.">            if ((posx &gt; 0 &amp;&amp; posx &lt; size)) {</span>
+<span class="pc bpc" id="L227" title="2 of 4 branches missed.">                if ((posy &gt; 0 &amp;&amp; posy &lt; size)) {</span>
+<span class="pc bpc" id="L228" title="6 of 8 branches missed.">                    if ((dir == 'N' || dir == 'E' || dir == 'S' || dir == 'W')) {</span>
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">                        if (check_a == 0) {</span>
+
+<span class="fc" id="L231">                            boolean ok = true;</span>
+<span class="fc" id="L232">                            char[] legal_chars = {'_', 'W', 'U', 'P', 'G', 'H'};</span>
+
+<span class="pc bpc" id="L234" title="1 of 4 branches missed.">                            for (int i = 0; i &lt; adat.length() &amp;&amp; ok; i++) {</span>
+<span class="fc" id="L235">                                ok = false;</span>
+<span class="fc bfc" id="L236" title="All 2 branches covered.">                                for (int j = 0; j &lt; legal_chars.length; j++) {</span>
+<span class="fc bfc" id="L237" title="All 2 branches covered.">                                    if (adat.charAt(i) == legal_chars[j]) ok = true;</span>
+                                }
+                            }
+<span class="pc bpc" id="L240" title="1 of 2 branches missed.">                            if (!ok) {</span>
+<span class="nc" id="L241">                                map.add_error_mess(&quot;Wrong symbol in data: &quot; + adat);</span>
+                            }
+<span class="fc" id="L243">                        } else {</span>
+<span class="nc" id="L244">                            map.add_error_mess(&quot;Bad data size : &quot; + check_a);</span>
+                        }
+                    } else {
+<span class="nc" id="L247">                        map.add_error_mess(String.format(&quot;Wrong dirrection '%c'&quot;, dir));</span>
+                    }
+                } else {
+<span class="nc" id="L250">                    map.add_error_mess(&quot;Wrong Y position: &quot; + posy);</span>
+                }
+            } else {
+<span class="nc" id="L253">                map.add_error_mess(&quot;Wrong X position: &quot; + posx);</span>
+            }
+        } else {
+<span class="nc" id="L256">            map.add_error_mess(&quot;Wrong board size: &quot; + size);</span>
+        }
+
+<span class="fc" id="L259">        this.board = null;</span>
+<span class="fc" id="L260">        this.board = new Board(size);</span>
+<span class="fc" id="L261">        return this.board.getMap(map);</span>
+    }
+
+    private boolean LoadState() {
+<span class="nc" id="L265">        return StateLoader(true);</span>
+    }
+
+    private boolean LoadMap() {
+<span class="nc" id="L269">        return StateLoader(false);</span>
+    }
+
+    private void saveState(String filename) {
+
+<span class="nc" id="L274">        int tipus = getFileType();</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">        String kit = (tipus == 0 ? &quot;.txt&quot; : &quot;.xml&quot;);</span>
+<span class="nc" id="L276">        board.saveToFile(filename + kit, true);</span>
+<span class="nc" id="L277">    }</span>
+
+    private void saveMap() {
+
+<span class="nc" id="L281">        int tipus = getFileType();</span>
+
+<span class="nc" id="L283">        boolean ok = false;</span>
+
+<span class="nc bnc" id="L285" title="All 2 branches missed.">        while(!ok) {</span>
+<span class="nc" id="L286">            System.out.print(&quot;\nKérem a pálya mentési nevét:&quot;);</span>
+<span class="nc" id="L287">            String s = scanner.nextLine();</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">            if(Sfv.isFileName(s)) {</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">                String kit = (tipus == 0 ? &quot;.txt&quot; : &quot;.xml&quot;);</span>
+<span class="nc" id="L290">                board.saveToFile(s + kit, false);</span>
+<span class="nc" id="L291">                ok = true;</span>
+            }
+<span class="nc" id="L293">        }</span>
+<span class="nc" id="L294">    }</span>
+
+    private void setName() {
+<span class="nc" id="L297">        boolean ok = false;</span>
+<span class="nc" id="L298">        String name = null;</span>
+
+<span class="nc" id="L300">        ArrayList&lt;String&gt; list = Sfv.listFiles(&quot;src\\Profiles\\&quot;);</span>
+
+<span class="nc bnc" id="L302" title="All 2 branches missed.">        while(!ok){</span>
+<span class="nc" id="L303">            System.out.print(&quot;User name:&quot;);</span>
+<span class="nc" id="L304">            name = scanner.nextLine();</span>
+
+<span class="nc bnc" id="L306" title="All 4 branches missed.">            if(Sfv.isAlpha(name) &amp;&amp; name.length() &gt;= 3) {</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">                if(!list.contains(name)) {</span>
+<span class="nc" id="L308">                    XmlMap profile = new XmlMap(0,0,0);</span>
+<span class="nc" id="L309">                    WriteToFile writer = new WriteToFile();</span>
+<span class="nc" id="L310">                    writer.saveGameState(profile, &quot;src\\Profiles\\&quot; + username + &quot;.xml&quot;);</span>
+                }
+
+<span class="nc" id="L313">                ok = true;</span>
+            }
+        }
+<span class="nc" id="L316">        username = name;</span>
+<span class="nc" id="L317">        userscore = 0;</span>
+<span class="nc" id="L318">    }</span>
+
+    ///////
+
+    private void drawBoard() {
+<span class="nc" id="L323">        int Col1 = 2;</span>
+<span class="nc" id="L324">        int Row1 = 2;</span>
+
+<span class="nc bnc" id="L326" title="All 2 branches missed.">        if(board != null) {</span>
+<span class="nc" id="L327">            int ch = 16 - (board.getSize() / 2) + Col1;</span>
+<span class="nc" id="L328">            int cw = 12 - (board.getSize() / 2) + Row1;</span>
+
+<span class="nc" id="L330">            board.DrawBoard();</span>
+
+        }
+<span class="nc" id="L333">    }</span>
+
+    private Coord getCoord() {
+
+<span class="nc" id="L337">        boolean correctCoords = false;</span>
+<span class="nc" id="L338">        int col = 0, row = 0;</span>
+
+<span class="nc bnc" id="L340" title="All 2 branches missed.">        while (!correctCoords) {</span>
+
+<span class="nc" id="L342">            System.out.print(&quot;Sor: &quot;);</span>
+<span class="nc" id="L343">            String srow = scanner.next();</span>
+
+<span class="nc" id="L345">            System.out.print(&quot;Oszlop: &quot;);</span>
+<span class="nc" id="L346">            String scol = scanner.next();</span>
+
+<span class="nc" id="L348">            row = Sfv.getInteger(srow);</span>
+
+<span class="nc bnc" id="L350" title="All 2 branches missed.">            if(scol.length() == 1) {    // ha egyetlen számjegy vagy betű</span>
+<span class="nc" id="L351">                int temp = scol.charAt(0);</span>
+
+<span class="nc bnc" id="L353" title="All 2 branches missed.">                if(temp &gt; 96) {         // ha nagybetű</span>
+<span class="nc" id="L354">                    col = temp - 97;</span>
+<span class="nc bnc" id="L355" title="All 2 branches missed.">                }else if(temp &gt; 64) {   // ha kisbetű</span>
+<span class="nc" id="L356">                    col = temp - 65;</span>
+                } else {
+<span class="nc" id="L358">                    col = temp - 48;</span>
+                }
+<span class="nc" id="L360">            } else {</span>
+<span class="nc" id="L361">                col = Sfv.getInteger(scol);</span>
+            }
+
+<span class="nc bnc" id="L364" title="All 4 branches missed.">            if (col &gt; -1 &amp;&amp; row &gt; -1) {</span>
+<span class="nc" id="L365">                correctCoords = true;</span>
+            }
+<span class="nc" id="L367">        }</span>
+<span class="nc" id="L368">        return new Coord(col, row);</span>
+    }
+
+    private boolean addHero() {
+
+<span class="nc" id="L373">        Coord coord = getCoord();</span>
+<span class="nc" id="L374">        int col = coord.getX();</span>
+<span class="nc" id="L375">        int row = coord.getY();</span>
+
+<span class="nc" id="L377">        return this.board.addHero(row,col,0, Direction.NORTH);</span>
+
+    }
+
+    private boolean addHeroR() {
+<span class="pc bpc" id="L382" title="1 of 2 branches missed.">        if(board != null) {</span>
+<span class="fc" id="L383">            return board.addHero();</span>
+        }
+<span class="nc" id="L385">        return false;</span>
+    }
+
+    private boolean addWumpus() {
+<span class="pc bpc" id="L389" title="1 of 2 branches missed.">        if(board != null) {</span>
+<span class="fc" id="L390">            return board.addWumpus();</span>
+        }
+<span class="nc" id="L392">        return false;</span>
+    }
+
+    private boolean addGold() {
+<span class="pc bpc" id="L396" title="1 of 2 branches missed.">        if(board != null) {</span>
+<span class="fc" id="L397">            return board.addGold();</span>
+        }
+<span class="nc" id="L399">        return false;</span>
+    }
+
+    private void addElement() {
+<span class="nc bnc" id="L403" title="All 2 branches missed.">        if(board != null) {</span>
+
+            boolean correctElement;
+            boolean correctType;
+
+<span class="nc" id="L408">            boolean ok = false;</span>
+<span class="nc" id="L409">            boolean finished = false;</span>
+
+<span class="nc" id="L411">            int choice = -1;</span>
+<span class="nc" id="L412">            int col = 0, row = 0;</span>
+
+<span class="nc bnc" id="L414" title="All 2 branches missed.">            while (!finished) {</span>
+
+<span class="nc" id="L416">                correctElement = false;</span>
+<span class="nc" id="L417">                correctType = false;</span>
+
+<span class="nc" id="L419">                Coord coord = getCoord();</span>
+<span class="nc" id="L420">                col = coord.getX();</span>
+<span class="nc" id="L421">                row = coord.getY();</span>
+
+<span class="nc bnc" id="L423" title="All 2 branches missed.">                while (!correctElement) {</span>
+<span class="nc" id="L424">                    System.out.println( &quot;1. Fal    &quot;);</span>
+<span class="nc" id="L425">                    System.out.println( &quot;2. Verem  &quot;);</span>
+<span class="nc" id="L426">                    System.out.println( &quot;3. Arany  &quot;);</span>
+<span class="nc" id="L427">                    System.out.println( &quot;4. Wumpusz&quot;);</span>
+<span class="nc" id="L428">                    System.out.println( &quot;   Válassz:&quot;);</span>
+
+<span class="nc" id="L430">                    String s = scanner.next();</span>
+
+<span class="nc" id="L432">                    choice = Sfv.getInteger(s);</span>
+
+<span class="nc bnc" id="L434" title="All 4 branches missed.">                    if (choice &gt; 0 &amp;&amp; choice &lt; 5) correctElement = true;</span>
+<span class="nc" id="L435">                }</span>
+
+<span class="nc" id="L437">                TileType type = TileType.EMPTY;</span>
+
+<span class="nc bnc" id="L439" title="All 2 branches missed.">                while (!correctType) {</span>
+
+<span class="nc" id="L441">                    correctType = true;</span>
+<span class="nc bnc" id="L442" title="All 5 branches missed.">                    switch (choice) {</span>
+                        case 1:
+<span class="nc" id="L444">                            type = TileType.WALL;</span>
+<span class="nc" id="L445">                            break;</span>
+                        case 2:
+<span class="nc" id="L447">                            type = TileType.PIT;</span>
+<span class="nc" id="L448">                            break;</span>
+                        case 3:
+<span class="nc" id="L450">                            type = TileType.GOLD;</span>
+<span class="nc" id="L451">                            break;</span>
+                        case 4:
+<span class="nc" id="L453">                            type = TileType.WUMPUS;</span>
+<span class="nc" id="L454">                            break;</span>
+                        default:
+<span class="nc" id="L456">                            correctType = false;</span>
+<span class="nc" id="L457">                            break;</span>
+                    }
+                }
+
+<span class="nc bnc" id="L461" title="All 2 branches missed.">                if (board.addElement(type, row, col)) finished = true;</span>
+<span class="nc" id="L462">            }</span>
+        }
+<span class="nc" id="L464">    }</span>
+
+    private void removeElement() {
+<span class="nc bnc" id="L467" title="All 2 branches missed.">        if(board != null) {</span>
+
+<span class="nc" id="L469">            boolean finished = false;</span>
+<span class="nc" id="L470">            int col = 0, row = 0;</span>
+
+<span class="nc bnc" id="L472" title="All 2 branches missed.">            while (!finished) {</span>
+
+<span class="nc" id="L474">                Coord coord = getCoord();</span>
+<span class="nc" id="L475">                col = coord.getX();</span>
+<span class="nc" id="L476">                row = coord.getY();</span>
+
+<span class="nc" id="L478">                board.removeElement(row, col);</span>
+<span class="nc" id="L479">                finished = true;</span>
+<span class="nc" id="L480">            }</span>
+        }
+<span class="nc" id="L482">    }</span>
+
+    public boolean saveProfile() {
+<span class="fc" id="L485">        XmlMap profile = new XmlMap();</span>
+<span class="fc" id="L486">        ReadFile reader = new ReadFile();</span>
+<span class="fc" id="L487">        WriteToFile writer = new WriteToFile();</span>
+
+<span class="fc" id="L489">        profile = reader.ReadInXmlFile(&quot;src\\Profiles\\&quot; + username + &quot;.xml&quot;);</span>
+
+<span class="fc" id="L491">        int hiscr = profile.getHiscore();</span>
+
+<span class="fc" id="L493">        hiscr++;</span>
+<span class="fc" id="L494">        int step = usersteps;</span>
+<span class="fc" id="L495">        int arrow = board.getHero().getArrows();</span>
+
+<span class="fc" id="L497">        profile.setArrows(arrow);</span>
+<span class="fc" id="L498">        profile.setHiscore(hiscr);</span>
+<span class="fc" id="L499">        profile.setSteps(step);</span>
+
+<span class="fc" id="L501">        return writer.saveGameState(profile, &quot;src\\Profiles\\&quot; + username + &quot;.xml&quot;);</span>
+    }
+
+    public boolean randomMap() {
+<span class="fc" id="L505">        Random random = new Random();</span>
+<span class="fc" id="L506">        int size = -1;</span>
+
+<span class="pc bpc" id="L508" title="1 of 4 branches missed.">        while(size &lt; 6 || size &gt; 20) {</span>
+<span class="fc" id="L509">            size = random.nextInt(20);</span>
+        }
+
+<span class="fc" id="L512">        createBoard(size);</span>
+<span class="pc bpc" id="L513" title="3 of 6 branches missed.">        if(addHeroR() &amp;&amp; addGold() &amp;&amp; addWumpus()) return true;</span>
+<span class="nc" id="L514">        return false;</span>
+    }
+
+    ///////
+
+    private void MainMenu() {
+
+<span class="nc" id="L521">        boolean finished = false;</span>
+<span class="nc" id="L522">        int choice = 0;</span>
+        String s;
+
+<span class="nc bnc" id="L525" title="All 2 branches missed.">        while(!finished) {</span>
+<span class="nc" id="L526">            drawBoard();</span>
+
+<span class="nc" id="L528">            System.out.println(&quot;1. Pálya szerkesztés&quot;);</span>
+<span class="nc" id="L529">            System.out.println(&quot;2. Pálya betöltése  &quot;);</span>
+<span class="nc" id="L530">            System.out.println(&quot;3. Pálya mentése    &quot;);</span>
+<span class="nc" id="L531">            System.out.println(&quot;4. Véletlen pálya   &quot;);</span>
+<span class="nc" id="L532">            System.out.println(&quot;0. Kilépés          &quot;);</span>
+<span class="nc" id="L533">            System.out.println(&quot;   Válassz:         &quot;);</span>
+
+<span class="nc" id="L535">            s = scanner.next();</span>
+
+<span class="nc" id="L537">            choice = Sfv.getInteger(s);</span>
+
+<span class="nc bnc" id="L539" title="All 6 branches missed.">            switch(choice) {</span>
+<span class="nc" id="L540">                case 1: EditBoardMenu(); break;</span>
+<span class="nc" id="L541">                case 2: LoadMap(); break;</span>
+<span class="nc" id="L542">                case 3: saveMap(); break;</span>
+<span class="nc" id="L543">                case 4: randomMap(); break;</span>
+<span class="nc" id="L544">                case 0: finished = true; break;</span>
+            }
+        }
+<span class="nc" id="L547">    }</span>
+
+    private void EditBoardMenu() {
+
+<span class="nc" id="L551">        boolean finished = false;</span>
+        int choice;
+        String s;
+
+<span class="nc bnc" id="L555" title="All 2 branches missed.">        while (!finished) {</span>
+<span class="nc" id="L556">            drawBoard();</span>
+
+<span class="nc" id="L558">            System.out.println(&quot;1. Pálya létrehozása    &quot;);</span>
+<span class="nc" id="L559">            System.out.println(&quot;2. Elem hozzáadása      &quot;);</span>
+<span class="nc" id="L560">            System.out.println(&quot;3. Elem eltávolítása    &quot;);</span>
+<span class="nc" id="L561">            System.out.println(&quot;4. Hős elhelyezése      &quot;);</span>
+<span class="nc" id="L562">            System.out.println(&quot;5. Wumpuszok elhelyezése&quot;);</span>
+<span class="nc" id="L563">            System.out.println(&quot;6. Arany elhelyezése    &quot;);</span>
+<span class="nc" id="L564">            System.out.println(&quot;7. Játék intdítása      &quot;);</span>
+            //System.out.println(&quot;8. Játék Betöltése      &quot;);
+            //System.out.println(&quot;9. Játék mentése        &quot;);
+<span class="nc" id="L567">            System.out.println(&quot;0. Főmenü               &quot;);</span>
+<span class="nc" id="L568">            System.out.println(&quot;   Válassz:             &quot;);</span>
+
+<span class="nc" id="L570">            s = scanner.next();</span>
+
+<span class="nc" id="L572">            choice = Sfv.getInteger(s);</span>
+
+<span class="nc bnc" id="L574" title="All 9 branches missed.">            switch (choice) {</span>
+<span class="nc" id="L575">                case 1: createBoard(-1); break;</span>
+<span class="nc" id="L576">                case 2: addElement(); break;</span>
+<span class="nc" id="L577">                case 3: removeElement(); break;</span>
+<span class="nc" id="L578">                case 4: addHero(); break;</span>
+<span class="nc" id="L579">                case 5: addWumpus(); break;</span>
+<span class="nc" id="L580">                case 6: addGold(); break;</span>
+<span class="nc" id="L581">                case 7: InGameMenu(); break;</span>
+                //case 9: saveState(username + &quot;_state.xml&quot;); break;
+<span class="nc" id="L583">                case 0: finished = true;</span>
+            }
+        }
+<span class="nc" id="L586">    }</span>
+
+    private void InGameMenu() {
+<span class="nc" id="L589">        win = false;</span>
+<span class="nc" id="L590">        giveup = false;</span>
+<span class="nc" id="L591">        gameover = false;</span>
+<span class="nc" id="L592">        herodead = false;</span>
+
+<span class="nc" id="L594">        usersteps = 0;</span>
+<span class="nc" id="L595">        int wumpus = board.getNumberOfWumpus();</span>
+<span class="nc" id="L596">        board.getHero().setArrows(wumpus);</span>
+
+<span class="nc bnc" id="L598" title="All 8 branches missed.">        while (!gameover &amp;&amp; !win &amp;&amp; !giveup &amp;&amp; !herodead) {</span>
+<span class="nc" id="L599">            drawBoard();</span>
+
+<span class="nc" id="L601">            System.out.println(&quot;1. Lépés         &quot;);</span>
+<span class="nc" id="L602">            System.out.println(&quot;2. Jobbra fordul &quot;);</span>
+<span class="nc" id="L603">            System.out.println(&quot;3. Balra fordul  &quot;);</span>
+<span class="nc" id="L604">            System.out.println(&quot;4. Felszed       &quot;);</span>
+<span class="nc" id="L605">            System.out.println(&quot;5. Lő            &quot;);</span>
+<span class="nc" id="L606">            System.out.println(&quot;6. Mentés        &quot;);</span>
+<span class="nc" id="L607">            System.out.println(&quot;7. Betölt        &quot;);</span>
+<span class="nc" id="L608">            System.out.println(&quot;0. Felad / Kilép &quot;);</span>
+<span class="nc" id="L609">            System.out.println(&quot;   Válassz:      &quot;);</span>
+
+<span class="nc" id="L611">            String s = scanner.next();</span>
+<span class="nc" id="L612">            int choice = Sfv.getInteger(s);</span>
+
+<span class="nc" id="L614">            usersteps++;</span>
+
+<span class="nc bnc" id="L616" title="All 9 branches missed.">            switch(choice) {</span>
+<span class="nc" id="L617">                case 1: board.heroStep(); break;</span>
+<span class="nc" id="L618">                case 2: board.heroTurnRight(); break;</span>
+<span class="nc" id="L619">                case 3: board.heroTurnLeft(); break;</span>
+<span class="nc" id="L620">                case 4: board.heroPickUp(); break;</span>
+<span class="nc" id="L621">                case 5: board.Shoot(); break;</span>
+<span class="nc" id="L622">                case 6: saveState(username + &quot;_state&quot;); break;</span>
+<span class="nc" id="L623">                case 7: LoadState(); break;</span>
+<span class="nc" id="L624">                case 0: gameover = true; break;</span>
+            }
+<span class="nc" id="L626">            herodead = board.getHero().isDead();</span>
+<span class="nc" id="L627">            win = board.getHero().hasGold();</span>
+
+<span class="nc" id="L629">        }</span>
+
+<span class="nc" id="L631">        XmlMap profile = new XmlMap();</span>
+<span class="nc" id="L632">        ReadFile reader = new ReadFile();</span>
+<span class="nc" id="L633">        WriteToFile writer = new WriteToFile();</span>
+
+<span class="nc" id="L635">        profile = reader.ReadInXmlFile(&quot;src\\Profiles\\&quot; + username + &quot;.xml&quot;);</span>
+
+<span class="nc" id="L637">        int hiscr = profile.getHiscore();</span>
+
+<span class="nc" id="L639">        hiscr++;</span>
+<span class="nc" id="L640">        int step = usersteps;</span>
+<span class="nc" id="L641">        int arrow = board.getHero().getArrows();</span>
+
+<span class="nc" id="L643">        profile.setArrows(arrow);</span>
+<span class="nc" id="L644">        profile.setHiscore(hiscr);</span>
+<span class="nc" id="L645">        profile.setSteps(step);</span>
+
+<span class="nc" id="L647">        writer.saveGameState(profile, &quot;src\\Profiles\\&quot; + username + &quot;.xml&quot;);</span>
+<span class="nc bnc" id="L648" title="All 2 branches missed.">        if(herodead) System.out.println(&quot;\n\n------- GAME OVER: A HŐS HALOTT!&quot;);</span>
+<span class="nc bnc" id="L649" title="All 2 branches missed.">        if(giveup) System.out.println(&quot;\n\n------- GAME OVER: FELADTAD!&quot;);</span>
+<span class="nc bnc" id="L650" title="All 2 branches missed.">        if(gameover) System.out.println(&quot;\n\n------- GAME OVER: KILÉPTÉL!&quot;);</span>
+<span class="nc bnc" id="L651" title="All 2 branches missed.">        if(win) System.out.println(&quot;\n\n------- GAME OVER: NYERTÉL!&quot;);</span>
+<span class="nc" id="L652">    }</span>
+
+    ///////
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

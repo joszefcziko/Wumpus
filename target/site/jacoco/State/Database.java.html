@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="hu"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Database.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Wumpus</a> &gt; <a href="index.source.html" class="el_package">State</a> &gt; <span class="el_source">Database.java</span></div><h1>Database.java</h1><pre class="source lang-java linenums">package State;
+
+import Base.wMap;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+public class Database {
+<span class="fc" id="L13">    private final String JDBC_DRIVER = &quot;com.mysql.jdbc.Driver&quot;;</span>
+<span class="fc" id="L14">    private final String DB_URL = &quot;jdbc:mysql://localhost/wumpus&quot;;</span>
+<span class="fc" id="L15">    private final String USER = &quot;root&quot;;</span>
+<span class="fc" id="L16">    private final String PASS = &quot;&quot;;</span>
+    private Connection conn;
+    private Statement stmt;
+    private ResultSet rs;
+    private boolean connected;
+
+<span class="fc" id="L22">    public Database() {</span>
+<span class="fc" id="L23">        connected = false;</span>
+        try {
+<span class="fc" id="L25">            Class.forName(&quot;com.mysql.cj.jdbc.Driver&quot;);</span>
+<span class="fc" id="L26">            conn = DriverManager.getConnection(DB_URL, USER, PASS);</span>
+<span class="fc" id="L27">            stmt = conn.createStatement();</span>
+<span class="fc" id="L28">            connected = true;</span>
+
+<span class="fc" id="L30">        } catch ( SQLException se) { System.out.println(&quot;------- SQL HIBA: &quot; + se.getMessage());</span>
+<span class="nc" id="L31">        } catch (Exception e) {  System.out.println(&quot;------- EXC HIBA: &quot; + e.getMessage());</span>
+<span class="fc" id="L32">        }</span>
+<span class="fc" id="L33">    }</span>
+
+    public ArrayList&lt;User&gt; getUsers() {
+
+<span class="fc" id="L37">        ArrayList&lt;User&gt; users = new ArrayList&lt;User&gt;();</span>
+<span class="fc" id="L38">        boolean ok = false;</span>
+
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if(connected) {</span>
+            try {
+
+<span class="fc" id="L43">                rs = stmt.executeQuery(&quot;SELECT name, passw, hiscore FROM users&quot;);</span>
+
+<span class="fc bfc" id="L45" title="All 2 branches covered.">                while (rs.next()) {</span>
+
+<span class="fc" id="L47">                    String name = rs.getString(&quot;name&quot;);</span>
+<span class="fc" id="L48">                    String passw = rs.getString(&quot;passw&quot;);</span>
+<span class="fc" id="L49">                    int hiscore = rs.getInt(&quot;hiscore&quot;);</span>
+
+<span class="fc" id="L51">                    User usr = new User(name, passw, hiscore);</span>
+<span class="fc" id="L52">                    users.add(usr);</span>
+<span class="fc" id="L53">                }</span>
+
+<span class="fc" id="L55">                rs.close();</span>
+<span class="fc" id="L56">                ok = true;</span>
+
+<span class="nc" id="L58">            } catch (SQLException se) {</span>
+<span class="nc" id="L59">                System.out.println(&quot;------- SQL HIBA: &quot; + se.getMessage());</span>
+<span class="nc" id="L60">            } catch (Exception e) {</span>
+<span class="nc" id="L61">                System.out.println(&quot;------- EXC HIBA: &quot; + e.getMessage());</span>
+<span class="pc" id="L62">            }</span>
+        }
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if(!ok) users = null;   // Megsemmisíti a lista objektumot</span>
+<span class="fc" id="L65">        return users;</span>
+    }
+
+    public ArrayList&lt;wMap&gt; getMaps(String map_name, String usr_name) {
+
+<span class="nc" id="L70">        boolean ok = false;</span>
+<span class="nc" id="L71">        ArrayList&lt;wMap&gt; levels = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        if(connected) {</span>
+            try {
+
+<span class="nc" id="L76">                rs = stmt.executeQuery(&quot;call LoadMap('&quot; + map_name + &quot;', '&quot; + usr_name + &quot;');&quot;);</span>
+
+<span class="nc bnc" id="L78" title="All 2 branches missed.">                while (rs.next()) {</span>
+
+                    /*
+                        map.id, users.name, map.name, map.size, map.herocol, map.herorow, map.data
+                    */
+                    //String name = rs.getString(&quot;name&quot;);
+<span class="nc" id="L84">                    int size = rs.getInt(&quot;map.size&quot;);</span>
+<span class="nc" id="L85">                    String usercol = rs.getString(&quot;map.herocol&quot;);</span>
+<span class="nc" id="L86">                    int userrow = rs.getInt(&quot;map.herorow&quot;);</span>
+<span class="nc" id="L87">                    String data = rs.getString(&quot;map.data&quot;);</span>
+
+<span class="nc" id="L89">                    wMap lv = new wMap(size, size, usercol.charAt(0) - 'A', userrow, 0, 0,0,data);</span>
+<span class="nc" id="L90">                    levels.add(lv);</span>
+<span class="nc" id="L91">                }</span>
+
+<span class="nc" id="L93">                rs.close();</span>
+<span class="nc" id="L94">                ok = true;</span>
+
+<span class="nc" id="L96">            } catch (SQLException se) {</span>
+<span class="nc" id="L97">                System.out.println(&quot;------- SQL HIBA: &quot; + se.getMessage());</span>
+<span class="nc" id="L98">            } catch (Exception e) {</span>
+<span class="nc" id="L99">                System.out.println(&quot;------- EXC HIBA: &quot; + e.getMessage());</span>
+<span class="nc" id="L100">            }</span>
+        }
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if(!ok) levels = null;</span>
+<span class="nc" id="L103">        return levels;</span>
+    }
+
+    public boolean isConnected() {
+<span class="fc" id="L107">        return this.connected;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

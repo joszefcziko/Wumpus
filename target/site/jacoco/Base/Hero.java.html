@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="hu"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Hero.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Wumpus</a> &gt; <a href="index.source.html" class="el_package">Base</a> &gt; <span class="el_source">Hero.java</span></div><h1>Hero.java</h1><pre class="source lang-java linenums">package Base;
+
+import Sfv.Sfv;
+
+public class Hero {
+    private int row;
+    private int column;
+    private Direction direction;
+    private int arrows;
+    private boolean hasGold;
+    private int steps;
+    private boolean live;
+    private Sfv sfv;
+
+<span class="fc" id="L15">    public Hero(int row, int col, int arrows) {</span>
+<span class="fc" id="L16">        this.row = row;</span>
+<span class="fc" id="L17">        this.column = col;</span>
+<span class="fc" id="L18">        this.direction = Direction.NORTH;</span>
+<span class="fc" id="L19">        this.arrows = arrows;</span>
+<span class="fc" id="L20">        this.hasGold = false;</span>
+<span class="fc" id="L21">        this.steps = 0;</span>
+<span class="fc" id="L22">        this.live = true;</span>
+<span class="fc" id="L23">    }</span>
+
+
+    public void turnLeft() {
+<span class="nc" id="L27">        int dir = sfv.StepBackInArray(this.direction.ordinal(), 4);</span>
+<span class="nc" id="L28">        this.direction = Direction.values()[dir];</span>
+<span class="nc" id="L29">    }</span>
+
+    public void turnRight() {
+<span class="nc" id="L32">        int dir = sfv.StepFowardInArray(this.direction.ordinal(), 4);</span>
+<span class="nc" id="L33">        this.direction = Direction.values()[dir];</span>
+<span class="nc" id="L34">    }</span>
+
+    public boolean shoot() {
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (this.arrows &gt; 0) {</span>
+<span class="nc" id="L38">            this.arrows--;</span>
+<span class="nc" id="L39">            return true;</span>
+        }
+<span class="nc" id="L41">        return false;</span>
+    }
+
+    public int getRow() {
+<span class="fc" id="L45">        return row;</span>
+    }
+
+    public void setRow(int row) {
+<span class="fc" id="L49">        this.row = row;</span>
+<span class="fc" id="L50">    }</span>
+
+    public int getCol() {
+<span class="fc" id="L53">        return column;</span>
+    }
+
+    public void setCol(int col) {
+<span class="fc" id="L57">        this.column = col;</span>
+<span class="fc" id="L58">    }</span>
+
+    public void setXY(int x, int y) {
+<span class="fc" id="L61">        setCol(x);</span>
+<span class="fc" id="L62">        setRow(y);</span>
+<span class="fc" id="L63">    }</span>
+
+    public Direction getDirection() {
+<span class="fc" id="L66">        return direction;</span>
+    }
+
+    public void setDirection(Direction direction) {
+<span class="fc" id="L70">        this.direction = direction;</span>
+<span class="fc" id="L71">    }</span>
+
+    public int getArrows() {
+<span class="fc" id="L74">        return arrows;</span>
+    }
+
+<span class="fc" id="L77">    public void setArrows(int arrows) { this.arrows = arrows; }</span>
+
+    public boolean loseArrow() {
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        if(this.arrows &gt; 0) {</span>
+<span class="fc" id="L81">            this.arrows--;</span>
+<span class="fc" id="L82">            return true;</span>
+        }
+<span class="fc" id="L84">        return false;</span>
+    }
+
+<span class="nc" id="L87">    public int getSteps() { return this.steps; }</span>
+
+<span class="nc" id="L89">    public void incSteps() { this.steps++; }</span>
+
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">    public boolean isDead() { return !this.live; }</span>
+
+<span class="fc" id="L93">    public void setDead() { this.live = false; }</span>
+
+    public void pickupGold() {
+<span class="fc" id="L96">        this.hasGold = true;</span>
+<span class="fc" id="L97">    }</span>
+
+    public int getGold() {
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if(this.hasGold) return 1;</span>
+<span class="fc" id="L101">        return 0;</span>
+    }
+
+    public boolean hasGold() {
+<span class="fc" id="L105">        return hasGold;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

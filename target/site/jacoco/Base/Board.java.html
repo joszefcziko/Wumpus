@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="hu"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Board.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Wumpus</a> &gt; <a href="index.source.html" class="el_package">Base</a> &gt; <span class="el_source">Board.java</span></div><h1>Board.java</h1><pre class="source lang-java linenums">package Base;
+
+
+import Sfv.Sfv;
+import State.WriteToFile;
+import State.XmlMap;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Random;
+
+public class Board {
+    private Tile[][] tiles;
+
+    private int size, numberOfWumpus, numberOfGold;
+    private Hero hero;
+<span class="fc" id="L20">    private int MAXGOLD = 1;</span>
+<span class="fc" id="L21">    private int MAXWUMPUS = 0;</span>
+
+    private File soundFile;
+    private AudioInputStream audioIn;
+    private Clip clip;
+
+<span class="fc" id="L27">    public Board(int size) {</span>
+
+        try {
+<span class="fc" id="L30">            soundFile = new File(&quot;src\\Sounds\\uhh.wav&quot;);</span>
+<span class="fc" id="L31">            audioIn = AudioSystem.getAudioInputStream(soundFile);</span>
+<span class="fc" id="L32">            clip = AudioSystem.getClip();</span>
+<span class="fc" id="L33">            clip.open(audioIn);</span>
+
+<span class="nc" id="L35">        } catch (Exception e) {</span>
+<span class="nc" id="L36">            System.out.println(e.getMessage());</span>
+<span class="fc" id="L37">        }</span>
+
+<span class="pc bpc" id="L39" title="2 of 4 branches missed.">        this.size = (size &lt;= 0 ? 6 : size &gt; 20 ? 20 : size);</span>
+<span class="fc" id="L40">        this.numberOfWumpus = 0;</span>
+<span class="fc" id="L41">        this.numberOfGold = 0;</span>
+
+<span class="fc" id="L43">        this.tiles = new Tile[size][size];</span>
+<span class="fc bfc" id="L44" title="All 4 branches covered.">        this.MAXWUMPUS = ( size &lt;= 8 ? 1 : ( size &lt;= 14 ? 2 : 3 ) );</span>
+<span class="fc" id="L45">        Init();</span>
+<span class="fc" id="L46">    }</span>
+
+    public Board() {
+<span class="nc" id="L49">        this(6);</span>
+<span class="nc" id="L50">    }</span>
+
+    public void Init() {
+
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        for (int i = 0; i &lt; size; i++) {</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">            for (int j = 0; j &lt; size; j++) {</span>
+<span class="fc" id="L56">                tiles[i][j] = new Tile();</span>
+
+<span class="fc bfc" id="L58" title="All 8 branches covered.">                if (i == 0 || i == size - 1 || j == 0 || j == size - 1) {</span>
+<span class="fc" id="L59">                    tiles[i][j].setType(TileType.WALL);</span>
+                }
+            }
+        }
+<span class="fc" id="L63">    }</span>
+
+    public boolean getMap(wMap wmap) {
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if (wmap.isOkay()) {</span>
+<span class="fc" id="L67">            String data = wmap.getData();</span>
+<span class="fc" id="L68">            int size = wmap.getSize();</span>
+<span class="fc" id="L69">            int herox = wmap.getPosx();</span>
+<span class="fc" id="L70">            int heroy = wmap.getPosy();</span>
+<span class="fc" id="L71">            Direction dir = wmap.getDirrection();</span>
+<span class="fc" id="L72">            int arrows = wmap.getArrows();</span>
+
+<span class="fc" id="L74">            this.hero = null; //new Hero(herox, heroy, arrows);</span>
+<span class="fc" id="L75">            this.tiles = new Tile[size][size];</span>
+<span class="fc" id="L76">            Init();</span>
+
+<span class="fc bfc" id="L78" title="All 2 branches covered.">            for(int i = 0; i &lt; size; i++) {</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">                for(int j = 0; j &lt; size; j++) {</span>
+
+<span class="fc" id="L81">                    Tile tile = new Tile();</span>
+<span class="fc" id="L82">                    char c = data.charAt(i * size + j);</span>
+
+<span class="pc bpc" id="L84" title="2 of 7 branches missed.">                    switch(c) {</span>
+
+<span class="fc" id="L86">                        case '_': tile.setType(TileType.EMPTY); break;</span>
+<span class="fc" id="L87">                        case 'W': tile.setType(TileType.WALL); break;</span>
+<span class="fc" id="L88">                        case 'U': tile.setType(TileType.WUMPUS); break;</span>
+<span class="fc" id="L89">                        case 'P': tile.setType(TileType.PIT); break;</span>
+<span class="fc" id="L90">                        case 'G': tile.setType(TileType.GOLD); break;</span>
+<span class="nc" id="L91">                        case 'H': tile.setType(TileType.HERO); break;</span>
+                    }
+                    //this.tiles[i][j] = tile;
+<span class="fc" id="L94">                    addElement(tile.getType(), i, j);</span>
+                }
+            }
+<span class="fc" id="L97">            addHero(heroy, herox, arrows, dir);</span>
+<span class="fc" id="L98">            return true;</span>
+        } else {
+<span class="nc" id="L100">            System.out.println(wmap.getErrorMessage());</span>
+        }
+<span class="nc" id="L102">        return false;</span>
+    }
+
+    public void DrawBoard() {
+
+<span class="fc" id="L107">        System.out.print(&quot;   &quot;);</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        for(int i = 0; i &lt; size; i++){</span>
+<span class="fc" id="L109">            System.out.print(String.format(&quot;%c&quot;, 'A' + i));</span>
+        }
+
+<span class="fc" id="L112">        System.out.println();</span>
+
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        for (int i = 0; i &lt; size; i++) {</span>
+<span class="fc" id="L115">            System.out.print(String.format(&quot;%2d &quot;, i));</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">            for (int j = 0; j &lt; size; j++) {</span>
+
+<span class="fc" id="L118">                String s = tiles[i][j].toString();</span>
+
+<span class="fc bfc" id="L120" title="All 2 branches covered.">                if(s.equals(&quot;W&quot;)) {</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">                    if (i == 0) {</span>
+<span class="fc" id="L122">                        System.out.print(&quot;▄&quot;);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">                    } else if (i == size - 1) {</span>
+<span class="fc" id="L124">                        System.out.print(&quot;▀&quot;);</span>
+<span class="pc bpc" id="L125" title="1 of 4 branches missed.">                    } else if (j == 0 || j == size - 1) {</span>
+<span class="fc" id="L126">                        System.out.print(&quot;█&quot;);</span>
+                    } else {
+<span class="nc" id="L128">                        System.out.print(&quot;█&quot;);</span>
+                    }
+                } else {
+<span class="fc" id="L131">                    System.out.print(tiles[i][j].toString());</span>
+                }
+            }
+
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">            if(this.hero != null) {</span>
+<span class="fc" id="L136">                int ug = getHeroGold();</span>
+<span class="fc" id="L137">                int bg = getGoldOfBoard();</span>
+<span class="fc" id="L138">                int ua = getHeroArrows();</span>
+<span class="fc" id="L139">                int bw = getWumpusOfBoard();</span>
+<span class="fc" id="L140">                int hx = getHeroX();</span>
+<span class="fc" id="L141">                int hy = getHeroY();</span>
+
+<span class="fc" id="L143">                String dn = getHeroDirectionName();</span>
+
+<span class="fc bfc" id="L145" title="All 5 branches covered.">                switch(i) {</span>
+<span class="fc" id="L146">                    case 0: System.out.print(String.format(&quot;     Arany:  %d / %d&quot;, ug, bg)); break;</span>
+<span class="fc" id="L147">                    case 1: System.out.print(String.format(&quot;     Nyilak: %d&quot;, ua)); break;</span>
+<span class="fc" id="L148">                    case 2: System.out.print(String.format(&quot;     Wumpus: %d&quot;, bw)); break;</span>
+<span class="fc" id="L149">                    case 3: System.out.print(String.format(&quot;     Irány:  %s, x: %2d, y: %2d&quot;, dn, hx, hy)); break;</span>
+                }
+            }
+
+<span class="fc" id="L153">            System.out.println();</span>
+        }
+<span class="fc" id="L155">    }</span>
+
+    public void heroStep( ) {
+<span class="fc" id="L158">        int row0 = hero.getRow();</span>
+<span class="fc" id="L159">        int col0 = hero.getCol();</span>
+<span class="fc" id="L160">        Direction dir = hero.getDirection();</span>
+<span class="fc" id="L161">        int row = 0, col = 0;</span>
+
+<span class="pc bpc" id="L163" title="4 of 5 branches missed.">        switch(dir) {</span>
+<span class="fc" id="L164">            case NORTH: row = row0 - 1; col = col0; break;</span>
+<span class="nc" id="L165">            case EAST: row = row0; col = col0 + 1; break;</span>
+<span class="nc" id="L166">            case SOUTH: row = row0 + 1; col = col0; break;</span>
+<span class="nc" id="L167">            case WEST: row = row0; col = col0 - 1; break;</span>
+        }
+
+<span class="fc" id="L170">        Tile tileTo = new Tile(tiles[row][col].getType());</span>
+
+        //if (onBoard(row, col)) {
+<span class="fc bfc" id="L173" title="All 2 branches covered.">        if(canMoveHero(row, col)){</span>
+<span class="pc bpc" id="L174" title="1 of 5 branches missed.">            switch(tileTo.getType()) {</span>
+<span class="fc" id="L175">                case EMPTY: tiles[row0][col0].setType(TileType.EMPTY);</span>
+<span class="fc" id="L176">                            tiles[row][col].setType(TileType.HERO);</span>
+<span class="fc" id="L177">                            hero.setXY(col, row); break;</span>
+<span class="fc" id="L178">                case WUMPUS: hero.setDead(); break;</span>
+<span class="fc" id="L179">                case PIT: hero.loseArrow(); break;</span>
+<span class="fc" id="L180">                case GOLD: tiles[row0][col0].setType(TileType.EMPTY);</span>
+<span class="fc" id="L181">                           tiles[row][col].setType(TileType.HERO);</span>
+<span class="fc" id="L182">                           hero.setXY(col,row);</span>
+<span class="fc" id="L183">                           hero.pickupGold(); break;</span>
+                //case WALL: break;
+            }
+            //tiles[row0][col0].setType(TileType.EMPTY);
+        }
+<span class="fc" id="L188">    }</span>
+
+    public void heroTurnRight() {
+<span class="nc" id="L191">        hero.turnRight();</span>
+<span class="nc" id="L192">    }</span>
+
+    public void heroTurnLeft() {
+<span class="nc" id="L195">        hero.turnLeft();</span>
+<span class="nc" id="L196">    }</span>
+
+<span class="fc" id="L198">    public int getSize() { return this.size; }</span>
+
+<span class="nc" id="L200">    public int getNumberOfGold() { return this.numberOfGold; }</span>
+
+<span class="fc" id="L202">    public int getNumberOfWumpus() { return this.numberOfWumpus; }</span>
+
+<span class="fc" id="L204">    public int getMaxWumpus() { return this.MAXWUMPUS; }</span>
+
+    ///////
+
+    public boolean onBoard(int row, int col) {
+<span class="pc bpc" id="L209" title="3 of 8 branches missed.">        if (row &gt;= 0 &amp;&amp; row &lt; size &amp;&amp; col &gt;= 0 &amp;&amp; col &lt; size) return true;</span>
+<span class="fc" id="L210">        return false;</span>
+    }
+
+    public boolean inField(int row, int col) {
+<span class="fc bfc" id="L214" title="All 8 branches covered.">        if (row &gt; 0 &amp;&amp; row &lt; size - 1 &amp;&amp; col &gt; 0 &amp;&amp; col &lt; size - 1) return true;</span>
+<span class="fc" id="L215">        return false;</span>
+    }
+
+    public boolean canAddWumpus() {
+
+        // WUMPUSZ-ból N &lt;= 8 esetén 1, 9 &lt;= N &lt;= 14 esetén 2, N &gt; 14 esetén 3.
+        // ez automatikusan állítódjon be N alapján
+
+        //int numberOfWumpus = ( size &lt;= 8 ? 1 : ( size &lt;= 14 ? 2 : 3 ) );
+<span class="fc bfc" id="L224" title="All 2 branches covered.">        if(this.numberOfWumpus &lt; MAXWUMPUS) return true;</span>
+<span class="fc" id="L225">        return false;</span>
+    }
+
+    public boolean canAddGold() {
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">        if (this.numberOfGold &lt; MAXGOLD) return true;</span>
+<span class="nc" id="L230">        return false;</span>
+    }
+
+    public boolean canAddHero() {
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">        if(hero == null) return true;</span>
+<span class="nc" id="L235">        return false;</span>
+    }
+
+    public boolean canMoveHero(int row, int col) {
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">        if(onBoard(row,col)) {</span>
+            //System.out.println(&quot;------- MOVE TO [&quot; + row + &quot;,&quot; + col + &quot;]: &quot; + tiles[row][col].getType());
+<span class="fc bfc" id="L241" title="All 2 branches covered.">            if(tiles[row][col].getType() != TileType.WALL) {</span>
+<span class="fc" id="L242">                return true;</span>
+            }
+        }
+<span class="fc" id="L245">        return false;</span>
+    }
+
+    ///////
+
+    public boolean addWumpus() {
+
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">        if(canAddWumpus()) {</span>
+
+<span class="fc" id="L254">            Random random = new Random();</span>
+
+<span class="fc bfc" id="L256" title="All 2 branches covered.">            for (int i = this.numberOfWumpus; i &lt; MAXWUMPUS; i++) {</span>
+<span class="fc" id="L257">                int wumpusRow = 0, wumpusColumn = 0;</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">                while (tiles[wumpusRow][wumpusColumn].getType() != TileType.EMPTY) {</span>
+<span class="fc" id="L259">                    wumpusRow = random.nextInt(size - 2) + 1;</span>
+<span class="fc" id="L260">                    wumpusColumn = random.nextInt(size - 2) + 1;</span>
+                }
+<span class="fc" id="L262">                tiles[wumpusRow][wumpusColumn].setType(TileType.WUMPUS);</span>
+            }
+<span class="fc" id="L264">            this.numberOfWumpus = MAXWUMPUS;</span>
+<span class="pc bpc" id="L265" title="1 of 2 branches missed.">            if(hero != null) hero.setArrows(this.numberOfWumpus);</span>
+<span class="fc" id="L266">            return true;</span>
+        }
+<span class="nc" id="L268">        return false;</span>
+    }
+
+    public boolean addGold(){
+
+<span class="pc bpc" id="L273" title="1 of 2 branches missed.">        if (canAddGold()) {</span>
+
+<span class="fc" id="L275">            Random random = new Random();</span>
+
+<span class="fc" id="L277">            int goldRow = 0, goldColumn = 0;</span>
+
+<span class="fc bfc" id="L279" title="All 2 branches covered.">            while (tiles[goldRow][goldColumn].getType() != TileType.EMPTY) {</span>
+<span class="fc" id="L280">                goldRow = random.nextInt(size - 2) + 1;</span>
+<span class="fc" id="L281">                goldColumn = random.nextInt(size - 2) + 1;</span>
+            }
+<span class="fc" id="L283">            tiles[goldRow][goldColumn].setType(TileType.GOLD);</span>
+<span class="fc" id="L284">            this.numberOfGold = 1;</span>
+<span class="fc" id="L285">            return true;</span>
+        }
+<span class="nc" id="L287">        return false;</span>
+    }
+
+    public boolean addHero() {
+
+<span class="pc bpc" id="L292" title="1 of 2 branches missed.">        if (canAddHero()) {</span>
+
+<span class="fc" id="L294">            Random random = new Random();</span>
+
+<span class="fc" id="L296">            int row = 0, col = 0;</span>
+
+<span class="fc bfc" id="L298" title="All 2 branches covered.">            while (tiles[row][col].getType() != TileType.EMPTY) {</span>
+<span class="fc" id="L299">                row = random.nextInt(size - 2) + 1;</span>
+<span class="fc" id="L300">                col = random.nextInt(size - 2) + 1;</span>
+            }
+<span class="fc" id="L302">            addHero(row, col, 3, Direction.NORTH);</span>
+<span class="fc" id="L303">            return true;</span>
+        }
+<span class="nc" id="L305">        return false;</span>
+    }
+
+    public boolean addHero(int row, int col, int arrow, Direction dir) {
+<span class="pc bpc" id="L309" title="1 of 2 branches missed.">        if(this.hero == null) {</span>
+<span class="fc bfc" id="L310" title="All 2 branches covered.">            if(inField(row, col)) {</span>
+<span class="fc" id="L311">                this.hero = new Hero(row, col, arrow);</span>
+<span class="fc" id="L312">                this.hero.setDirection(dir);</span>
+<span class="fc" id="L313">                this.tiles[row][col].setType(TileType.HERO);</span>
+<span class="fc" id="L314">                return true;</span>
+            }
+        }
+<span class="fc" id="L317">        return false;</span>
+    }
+
+    public boolean addElement(TileType type, int row, int col) {
+
+<span class="pc bpc" id="L322" title="1 of 4 branches missed.">        boolean canputgold = (type == TileType.GOLD &amp;&amp; canAddGold());</span>
+<span class="fc bfc" id="L323" title="All 4 branches covered.">        boolean canputwumpus = (type == TileType.WUMPUS &amp;&amp; canAddWumpus());</span>
+<span class="fc bfc" id="L324" title="All 4 branches covered.">        boolean canputelement = ((type == TileType.WALL || type == TileType.PIT));</span>
+<span class="pc bpc" id="L325" title="1 of 4 branches missed.">        boolean canputhero = (type == TileType.HERO &amp;&amp; canAddHero());</span>
+<span class="pc bpc" id="L326" title="1 of 4 branches missed.">        boolean correctzone = (inField(row, col) &amp;&amp; (tiles[row][col].getType() == TileType.EMPTY));</span>
+
+<span class="fc bfc" id="L328" title="All 8 branches covered.">        if(canputgold || canputwumpus || canputelement || canputhero) {</span>
+<span class="fc bfc" id="L329" title="All 2 branches covered.">            if (correctzone) {</span>
+<span class="fc" id="L330">                tiles[row][col].setType(type);</span>
+<span class="fc bfc" id="L331" title="All 2 branches covered.">                if(canputgold) numberOfGold++;</span>
+<span class="fc bfc" id="L332" title="All 2 branches covered.">                if(canputwumpus) numberOfWumpus++;</span>
+<span class="fc bfc" id="L333" title="All 2 branches covered.">                if(canputhero) addHero(row,col,0,Direction.NORTH);</span>
+<span class="fc" id="L334">                return true;</span>
+            }
+        }
+<span class="fc" id="L337">        return false;</span>
+    }
+
+    public boolean removeElement(int row, int col) {
+<span class="fc bfc" id="L341" title="All 2 branches covered.">        if (inField(row, col)) {</span>
+<span class="fc" id="L342">            tiles[row][col].setType(TileType.EMPTY);</span>
+<span class="fc" id="L343">            return true;</span>
+        }
+<span class="fc" id="L345">        return false;</span>
+    }
+
+    public void heroPickUp() {
+<span class="fc" id="L349">        int row = hero.getRow();</span>
+<span class="fc" id="L350">        int col = hero.getCol();</span>
+<span class="fc" id="L351">        int row0 = 0, col0 = 0;</span>
+
+        //System.out.println(&quot;------- HERO: &quot;  + row + &quot;,&quot; + col);
+
+<span class="pc bpc" id="L355" title="4 of 5 branches missed.">        switch(hero.getDirection()) {</span>
+<span class="fc" id="L356">            case NORTH: row0 = row - 1; col0 = col; break;</span>
+<span class="nc" id="L357">            case EAST: row0 = row; col0 = col + 1; break;</span>
+<span class="nc" id="L358">            case SOUTH: row0 = row + 1; col0 = col; break;</span>
+<span class="nc" id="L359">            case WEST: row0 = row; col0 = col - 1; break;</span>
+        }
+
+<span class="pc bpc" id="L362" title="2 of 3 branches missed.">        switch(tiles[row0][col0].getType()) {</span>
+<span class="fc" id="L363">            case GOLD: tiles[row0][col0].setType(TileType.EMPTY);</span>
+<span class="fc" id="L364">                 hero.pickupGold(); break;</span>
+<span class="nc" id="L365">            case WUMPUS: hero.setDead(); break;</span>
+        }
+<span class="fc" id="L367">    }</span>
+
+    ///////
+
+<span class="fc" id="L371">    private int getWumpusOfBoard() { return this.numberOfWumpus; }</span>
+
+    private int getGoldOfBoard() {
+<span class="fc" id="L374">        return this.numberOfGold;</span>
+    }
+
+    private int getHeroGold() {
+<span class="pc bpc" id="L378" title="1 of 2 branches missed.">        if(this.hero != null) return this.hero.getGold();</span>
+<span class="nc" id="L379">        return 0;</span>
+    }
+
+    private int getHeroArrows() {
+<span class="pc bpc" id="L383" title="1 of 2 branches missed.">        if(this.hero != null) return this.hero.getArrows();</span>
+<span class="nc" id="L384">        return -1;</span>
+    }
+
+    private int getHeroX() {
+<span class="pc bpc" id="L388" title="1 of 2 branches missed.">        if(this.hero != null) return this.hero.getCol();</span>
+<span class="nc" id="L389">        return 0;</span>
+    }
+
+    private int getHeroY() {
+<span class="pc bpc" id="L393" title="1 of 2 branches missed.">        if(this.hero != null) return this.hero.getRow();</span>
+<span class="nc" id="L394">        return 0;</span>
+    }
+
+    public String getHeroDirectionName() {
+<span class="pc bpc" id="L398" title="1 of 2 branches missed.">        if (hero != null) return hero.getDirection().getDirectionName();</span>
+<span class="nc" id="L399">        return &quot;NONE&quot;;</span>
+    }
+
+    public Board getBoard() {
+<span class="fc" id="L403">        return this;</span>
+    }
+
+    public Tile[][] getTiles() {
+<span class="nc" id="L407">        return this.tiles;</span>
+    }
+
+    public TileType getTileType(int row, int col) {
+<span class="pc bpc" id="L411" title="1 of 2 branches missed.">        if(onBoard(row, col)) {</span>
+<span class="fc" id="L412">            return tiles[row][col].getType();</span>
+        }
+<span class="nc" id="L414">        return TileType.UNKNOWN;</span>
+    }
+
+    public TileType getTile(int row, int col) {
+<span class="fc" id="L418">        return this.tiles[row][col].getType();</span>
+    }
+
+    public Hero getHero() {
+<span class="fc" id="L422">        return this.hero;</span>
+    }
+
+
+    public boolean Shoot() {
+
+<span class="fc bfc" id="L428" title="All 2 branches covered.">        if (hero.loseArrow() ) {</span>
+
+<span class="fc" id="L430">            boolean HORISONTAL = false;</span>
+<span class="fc" id="L431">            boolean UP = false;</span>
+<span class="fc" id="L432">            int col = 0, row = 0;</span>
+<span class="fc" id="L433">            int from = 0, to = 0;</span>
+
+<span class="pc bpc" id="L435" title="1 of 5 branches missed.">            switch (hero.getDirection()) {</span>
+                case NORTH:
+<span class="fc" id="L437">                    from = hero.getRow();</span>
+<span class="fc" id="L438">                    to = 0;</span>
+<span class="fc" id="L439">                    break;</span>
+                case EAST:
+<span class="fc" id="L441">                    from = hero.getCol();</span>
+<span class="fc" id="L442">                    to = size - 1;</span>
+<span class="fc" id="L443">                    HORISONTAL = true;</span>
+<span class="fc" id="L444">                    UP = true;</span>
+<span class="fc" id="L445">                    break;</span>
+                case SOUTH:
+<span class="fc" id="L447">                    from = hero.getRow();</span>
+<span class="fc" id="L448">                    to = size - 1;</span>
+<span class="fc" id="L449">                    UP = true;</span>
+<span class="fc" id="L450">                    break;</span>
+                case WEST:
+<span class="fc" id="L452">                    from = hero.getCol();</span>
+<span class="fc" id="L453">                    to = 0;</span>
+<span class="fc" id="L454">                    HORISONTAL = true;</span>
+                    break;
+            }
+
+<span class="fc" id="L458">            Tile tile = new Tile();</span>
+<span class="fc" id="L459">            boolean stop = false;</span>
+
+<span class="fc bfc" id="L461" title="All 2 branches covered.">            if (UP) {</span>
+<span class="pc bpc" id="L462" title="1 of 4 branches missed.">                for (int i = from; i &lt; to &amp;&amp; !stop; i++) {</span>
+<span class="fc bfc" id="L463" title="All 2 branches covered.">                    if (HORISONTAL) {</span>
+<span class="fc" id="L464">                        row = hero.getRow();</span>
+<span class="fc" id="L465">                        col = i;</span>
+<span class="fc" id="L466">                        tile.setType(tiles[row][col].getType());</span>
+
+                    } else {
+<span class="fc" id="L469">                        row = i;</span>
+<span class="fc" id="L470">                        col = hero.getCol();</span>
+<span class="fc" id="L471">                        tile.setType(tiles[row][col].getType());</span>
+                    }
+
+<span class="pc bpc" id="L474" title="1 of 4 branches missed.">                    if (tile.getType() == TileType.WALL || tile.getType() == TileType.WUMPUS) stop = true;</span>
+                }
+            } else {
+<span class="pc bpc" id="L477" title="1 of 4 branches missed.">                for (int i = from; i &gt; to &amp;&amp; !stop; i--) {</span>
+<span class="fc bfc" id="L478" title="All 2 branches covered.">                    if (HORISONTAL) {</span>
+<span class="fc" id="L479">                        row = hero.getRow();</span>
+<span class="fc" id="L480">                        col = i;</span>
+<span class="fc" id="L481">                        tile.setType(tiles[row][col].getType());</span>
+                    } else {
+<span class="fc" id="L483">                        row = i;</span>
+<span class="fc" id="L484">                        col = hero.getCol();</span>
+<span class="fc" id="L485">                        tile.setType(tiles[row][col].getType());</span>
+                    }
+
+<span class="pc bpc" id="L488" title="1 of 4 branches missed.">                    if (tile.getType() == TileType.WALL || tile.getType() == TileType.WUMPUS) {</span>
+<span class="fc" id="L489">                        stop = true;</span>
+                    }
+                }
+            }
+
+<span class="pc bpc" id="L494" title="1 of 2 branches missed.">            if (tile.getType() == TileType.WALL) hero.loseArrow();</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">            if (tile.getType() == TileType.WUMPUS) {</span>
+<span class="fc" id="L496">                numberOfWumpus--;</span>
+
+<span class="fc" id="L498">                clip.start();</span>
+<span class="fc" id="L499">                tiles[row][col].setType(TileType.EMPTY);</span>
+            }
+<span class="fc" id="L501">            return true;</span>
+        }
+<span class="fc" id="L503">        return false;</span>
+    }
+
+    public boolean saveToFile(String filename, boolean state) {
+
+<span class="fc" id="L508">        String extension = Sfv.getFileExtension(filename);</span>
+
+<span class="fc" id="L510">        ArrayList&lt;String&gt; rows = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L511">        StringBuilder sb = new StringBuilder();</span>
+
+<span class="fc bfc" id="L513" title="All 2 branches covered.">        String DIR = (state ? &quot;src\\States\\&quot; : &quot;src\\Maps\\&quot;);</span>
+
+<span class="fc" id="L515">        int hx = 0;</span>
+<span class="fc" id="L516">        int hy = 0;</span>
+<span class="fc" id="L517">        int arrows = 0;</span>
+<span class="fc" id="L518">        char cx = 0;</span>
+<span class="fc" id="L519">        String direction = &quot;N&quot;;</span>
+
+<span class="pc bpc" id="L521" title="1 of 2 branches missed.">        if(hero != null) {</span>
+
+<span class="fc" id="L523">            hx = hero.getCol();</span>
+<span class="fc" id="L524">            hy = hero.getRow();</span>
+<span class="fc" id="L525">            arrows = hero.getArrows();</span>
+<span class="fc" id="L526">            cx = (char) ('A' + hx);</span>
+<span class="fc" id="L527">            direction = String.valueOf(hero.getDirection().toString().charAt(0));</span>
+
+<span class="fc" id="L529">            tiles[hy][hx].setType(TileType.EMPTY);</span>
+        }
+
+
+<span class="fc bfc" id="L533" title="All 2 branches covered.">        if(extension.equals(&quot;txt&quot;)) {</span>
+<span class="fc" id="L534">            sb.append(size + &quot; &quot; + hy + &quot; &quot; + cx + &quot; &quot; + direction + &quot;\r\n&quot;);</span>
+<span class="fc bfc" id="L535" title="All 2 branches covered.">            for (int i = 0; i &lt; size; i++) {</span>
+<span class="fc bfc" id="L536" title="All 2 branches covered.">                for (int j = 0; j &lt; size; j++) {</span>
+<span class="fc" id="L537">                    sb.append(tiles[i][j].toString());</span>
+                }
+<span class="fc" id="L539">                sb.append(&quot;\r\n&quot;);</span>
+            }
+
+<span class="fc" id="L542">            WriteToFile writer = new WriteToFile();</span>
+<span class="fc" id="L543">            boolean ok = writer.saveToTextFile(DIR + filename, sb.toString());</span>
+<span class="fc" id="L544">            sb.delete(0, sb.length());</span>
+<span class="fc" id="L545">            return ok;</span>
+        }
+
+<span class="pc bpc" id="L548" title="1 of 2 branches missed.">        if(extension.equals(&quot;xml&quot;)) {</span>
+
+<span class="fc bfc" id="L550" title="All 2 branches covered.">            for(int i = 0; i &lt; size; i++) {</span>
+<span class="fc bfc" id="L551" title="All 2 branches covered.">                for(int j = 0; j &lt; size; j++) {</span>
+<span class="fc" id="L552">                    sb.append(tiles[i][j].toString());</span>
+                }
+<span class="fc" id="L554">                rows.add(sb.toString());</span>
+<span class="fc" id="L555">                sb.delete(0, sb.length());</span>
+            }
+
+<span class="fc" id="L558">            XmlMap map = new XmlMap();</span>
+
+<span class="fc" id="L560">            map.setSize(size);</span>
+<span class="fc" id="L561">            map.setArrows(arrows);</span>
+<span class="fc" id="L562">            map.setRows(rows);</span>
+<span class="fc" id="L563">            map.setHeroCol(String.valueOf(cx));</span>
+<span class="fc" id="L564">            map.setHeroRow(hy);</span>
+<span class="fc" id="L565">            map.setHeroDir(direction);</span>
+
+<span class="fc" id="L567">            WriteToFile writer = new WriteToFile();</span>
+<span class="fc" id="L568">            return writer.saveGameState(map, DIR + filename);</span>
+
+        }
+<span class="nc" id="L571">        return false;</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

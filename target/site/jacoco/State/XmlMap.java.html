@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="hu"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>XmlMap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Wumpus</a> &gt; <a href="index.source.html" class="el_package">State</a> &gt; <span class="el_source">XmlMap.java</span></div><h1>XmlMap.java</h1><pre class="source lang-java linenums">package State;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
+
+@XmlRootElement
+public class XmlMap {
+    private int size;
+    private String heroCol;
+    private int heroRow;
+    private int arrows;
+    private int hiscore;
+    private int steps;
+    private String heroDir;
+    private List&lt;String&gt; rows;
+    private boolean error;
+
+<span class="fc" id="L19">    public XmlMap() {</span>
+<span class="fc" id="L20">         this.error = false;</span>
+<span class="fc" id="L21">    }</span>
+
+<span class="nc" id="L23">    public XmlMap(int arrows, int hiscore, int steps) {</span>
+<span class="nc" id="L24">        this.arrows = arrows;</span>
+<span class="nc" id="L25">        this.hiscore = hiscore;</span>
+<span class="nc" id="L26">        this.steps = steps;</span>
+<span class="nc" id="L27">    }</span>
+
+    @XmlElement(name = &quot;size&quot;)
+    public int getSize() {
+<span class="fc" id="L31">        return size;</span>
+    }
+
+    @XmlElement(name = &quot;heroCol&quot;)
+    public String getHeroCol() {
+<span class="fc" id="L36">        return heroCol;//.toUpperCase();</span>
+    }
+
+    @XmlElement(name = &quot;heroRow&quot;)
+<span class="fc" id="L40">    public int getHeroRow() { return heroRow; }</span>
+
+    @XmlElement(name = &quot;heroDir&quot;)
+    public String getHeroDir() {
+<span class="fc" id="L44">        return heroDir;//.toUpperCase();</span>
+    }
+
+    @XmlElement(name = &quot;row&quot;)
+    public List&lt;String&gt; getRows() {
+<span class="fc" id="L49">        return rows;</span>
+    }
+
+    @XmlElement(name = &quot;arrows&quot;)
+    public int getArrows() {
+<span class="fc" id="L54">        return arrows;</span>
+    }
+
+    @XmlElement(name = &quot;hiscore&quot;)
+    public int getHiscore() {
+<span class="fc" id="L59">        return hiscore;</span>
+    }
+
+    @XmlElement(name = &quot;steps&quot;)
+    public int getSteps() {
+<span class="fc" id="L64">        return steps;</span>
+    }
+
+    ////////////////
+
+    public void setArrows(int arrows) {
+<span class="fc" id="L70">        this.arrows = arrows;</span>
+<span class="fc" id="L71">    }</span>
+
+    public void setRows(List&lt;String&gt; rows) {
+<span class="fc" id="L74">        this.rows = rows;</span>
+<span class="fc" id="L75">    }</span>
+
+    public boolean isError() {
+<span class="fc" id="L78">        return error;</span>
+    }
+
+    public void setError(boolean error) {
+<span class="fc" id="L82">        this.error = error;</span>
+<span class="fc" id="L83">    }</span>
+
+    public void setSize(int size) {
+<span class="fc" id="L86">        this.size = size;</span>
+<span class="fc" id="L87">    }</span>
+
+    public void setHeroCol(String heroCol) {
+<span class="fc" id="L90">        this.heroCol = heroCol;</span>
+<span class="fc" id="L91">    }</span>
+
+    public void setHeroRow(int heroRow) {
+<span class="fc" id="L94">        this.heroRow = heroRow;</span>
+<span class="fc" id="L95">    }</span>
+
+    public void setHeroDir(String heroDir) {
+<span class="fc" id="L98">        this.heroDir = heroDir;</span>
+<span class="fc" id="L99">    }</span>
+
+    public void setHiscore(int hiscore) {
+<span class="fc" id="L102">        this.hiscore = hiscore;</span>
+<span class="fc" id="L103">    }</span>
+
+    public void setSteps(int steps) {
+<span class="fc" id="L106">        this.steps = steps;</span>
+<span class="fc" id="L107">    }</span>
+
+    public String getData() {
+<span class="fc" id="L110">        StringBuilder data = new StringBuilder();</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        for(int i = 0; i &lt; rows.size(); data.append(rows.get(i++)));</span>
+<span class="fc" id="L112">        return data.toString().toUpperCase();</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L117">        return &quot;XmlMap{&quot; +</span>
+                &quot;, size=&quot; + size +
+                &quot;, heroCol='&quot; + heroCol + '\'' +
+                &quot;, heroRow=&quot; + heroRow +
+                &quot;, heroDir='&quot; + heroDir + '\'' +
+                &quot;, rows=&quot; + rows +
+                &quot;, error=&quot; + error +
+                '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

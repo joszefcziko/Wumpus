@@ -1,0 +1,4 @@
+#Thu Dec 07 13:55:37 CET 2023
+configuration*?=FDB3505F68D540CCA78BAB13732A9999D3F3FBB
+module-resource*?\:checkstyle-xpath-suppressions.xml=9BC7C760369CD0DC64FEEE6F43B923EA1DBACF32
+module-resource*?\:checkstyle-suppressions.xml=12D6B2C60F095759831BC99355518AE7B7A1498E

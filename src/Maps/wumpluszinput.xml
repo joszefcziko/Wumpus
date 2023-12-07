@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xmlMap>
+    <size>6</size>
+    <heroCol>B</heroCol>
+    <heroRow>5</heroRow>
+    <heroDir>E</heroDir>
+    <arrows>3</arrows>
+    <row>WWWWWW</row>
+    <row>W___PW</row>
+    <row>WUGP_W</row>
+    <row>W____W</row>
+    <row>W__P_W</row>
+    <row>WWWWWW</row>
+</xmlMap>

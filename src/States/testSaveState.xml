@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xmlMap>
+    <arrows>3</arrows>
+    <error>false</error>
+    <heroCol>F</heroCol>
+    <heroDir>N</heroDir>
+    <heroRow>5</heroRow>
+    <hiscore>0</hiscore>
+    <row>WWWWWWWWWWWWWWW</row>
+    <row>W_____________W</row>
+    <row>W_____________W</row>
+    <row>W_____________W</row>
+    <row>W_____________W</row>
+    <row>W__G__________W</row>
+    <row>W_____________W</row>
+    <row>W__U__________W</row>
+    <row>W_____________W</row>
+    <row>W_U____U______W</row>
+    <row>W_____________W</row>
+    <row>W_____________W</row>
+    <row>W_____________W</row>
+    <row>W_____________W</row>
+    <row>WWWWWWWWWWWWWWW</row>
+    <size>15</size>
+    <steps>0</steps>
+</xmlMap>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xmlMap>
+    <size>16</size>
+    <arrows>0</arrows>
+    <error>false</error>
+    <heroCol>K</heroCol>
+    <heroDir>N</heroDir>
+    <heroRow>10</heroRow>
+    <row>WWWWWWWWWWWWWWWW</row>
+    <row>W______________W</row>
+    <row>W______________W</row>
+    <row>W______________W</row>
+    <row>W______________W</row>
+    <row>W______________W</row>
+    <row>W___UU_________W</row>
+    <row>W______________W</row>
+    <row>W______________W</row>
+    <row>W______________W</row>
+    <row>W______________W</row>
+    <row>W______________W</row>
+    <row>W___________U__W</row>
+    <row>W____G_________W</row>
+    <row>W______________W</row>
+    <row>WWWWWWWWWWWWWWWW</row>
+</xmlMap>
